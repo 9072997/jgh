@@ -19,7 +19,7 @@ import "runtime/debug"
 
 // sets pointer to something
 
-func derefrenceInterface(ptrIface interface{}) (iface interface{}, err error) {
+func DerefrenceInterface(ptrIface interface{}) (iface interface{}, err error) {
 	// derefrence outputPtr (using reflection since it's an interface)
 	// turn the interface into a value (of the pointer)
 	ptrVal := reflect.ValueOf(ptrIface)
@@ -31,7 +31,7 @@ func derefrenceInterface(ptrIface interface{}) (iface interface{}, err error) {
 }
 
 // given an example of type exIface, returns a pointer to a zero value for exIface
-func ptrToZeroOf(exIface interface{}) (zeroPtrIface interface{}) {
+func PtrToZeroOf(exIface interface{}) (zeroPtrIface interface{}) {
 	// get the type of example
 	exType := reflect.TypeOf(exIface)
 
@@ -45,7 +45,7 @@ func ptrToZeroOf(exIface interface{}) (zeroPtrIface interface{}) {
 }
 
 // nolint: megacheck, deadcode
-func initSlice(s interface{}, len int) (err error) {
+func InitSlice(s interface{}, len int) (err error) {
 	// turn the interface into a value (of the pointer)
 	vInt := reflect.ValueOf(s)
 
@@ -120,7 +120,7 @@ func initPtr(ptrPtrIface interface{}) {
 // retryes f()(bool) at i second intervals up to t times until f() == true
 // note that this function will also retry on panic
 // prints "msg (will retry up to t times)" for each try
-func try(interval int, tries int, allowPanic bool, msg string, f func() bool) bool { // nolint: deadcode, megacheck
+func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bool { // nolint: deadcode, megacheck
 	// this makes sure we don't panic if f() does
 	defer func() {
 		// if we are on our last iteration, let the panic continue to bubble up
@@ -158,7 +158,7 @@ func try(interval int, tries int, allowPanic bool, msg string, f func() bool) bo
 	return false
 }
 
-func httpClient(cookieJar bool, followRedirects bool) (client *http.Client) {
+func HttpClient(cookieJar bool, followRedirects bool) (client *http.Client) {
 	log.Printf("Making new http client cookieJar:%t, followRedirects:%t", cookieJar, followRedirects)
 
 	client = new(http.Client)
@@ -181,7 +181,7 @@ func httpClient(cookieJar bool, followRedirects bool) (client *http.Client) {
 	return
 }
 
-func httpRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, reqBody string) (respBody string, status int) {
+func HttpRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, reqBody string) (respBody string, status int) {
 	log.Printf("HTTP %s %s", method, url)
 
 	// empty string indicates no request body
@@ -248,7 +248,7 @@ func httpRequest(client *http.Client, method string, url string, user string, pa
 	return
 }
 
-func restRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, input interface{}, outputPtr interface{}) (status int, reflection bool) {
+func RestRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, input interface{}, outputPtr interface{}) (status int, reflection bool) {
 	hasInput := input != nil
 	hasOutput := outputPtr != nil
 
@@ -275,24 +275,24 @@ func restRequest(client *http.Client, method string, url string, user string, pa
 	}
 
 	// perform the request
-	respStr, status := httpRequest(client, method, url, user, pass, headers, jsonStr)
+	respStr, status := HttpRequest(client, method, url, user, pass, headers, jsonStr)
 
 	// even if the user dosen't want output, we still need a place to store
 	// it so we can check for reflection
 	if hasInput && !hasOutput {
-		outputPtr = ptrToZeroOf(input)
+		outputPtr = PtrToZeroOf(input)
 	}
 
 	if hasInput || hasOutput {
 		bytes := []byte(respStr)
 		err := json.Unmarshal(bytes, outputPtr)
-		panicOnErr(err)
+		PanicOnErr(err)
 	}
 
 	if hasInput {
 		// many calls return the input as output on success, so we check for this here
-		output, err := derefrenceInterface(outputPtr)
-		panicOnErr(err)
+		output, err := DerefrenceInterface(outputPtr)
+		PanicOnErr(err)
 
 		reflection = reflect.DeepEqual(input, output)
 	}
@@ -300,14 +300,14 @@ func restRequest(client *http.Client, method string, url string, user string, pa
 	return
 }
 
-func expect(expected interface{}, input interface{}, name string) {
+func Expect(expected interface{}, input interface{}, name string) {
 	if !reflect.DeepEqual(input, expected) {
 		msg := fmt.Sprintf("Expected %v to be %v, got %s", name, expected, input)
 		panic(msg)
 	}
 }
 
-func panicOnErr(err error) {
+func PanicOnErr(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -319,7 +319,7 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-func randomString(n int) string {
+func RandomString(n int) string {
 	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, n)
 	for i := range b {
