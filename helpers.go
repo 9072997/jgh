@@ -1,4 +1,4 @@
-package main
+package jgh
 
 import "reflect"
 import "time"
