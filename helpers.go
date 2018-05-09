@@ -327,11 +327,3 @@ func randomString(n int) string {
 	}
 	return string(b)
 }
-
-////////////////////////////////
-// application specific stuff //
-////////////////////////////////
-
-func esURL(c Cluster) string { // nolint: deadcode, megacheck
-	return fmt.Sprintf("%s:%d", c.URL, c.Port)
-}
