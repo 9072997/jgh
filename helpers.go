@@ -121,18 +121,6 @@ func initPtr(ptrPtrIface interface{}) {
 // note that this function will also retry on panic
 // prints "msg (will retry up to t times)" for each try
 func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bool { // nolint: deadcode, megacheck
-	// this makes sure we don't panic if f() does
-	defer func() {
-		// if we are on our last iteration, let the panic continue to bubble up
-		if tries > 1 || !allowPanic {
-			err := recover()
-			if err != nil {
-				log.Printf("Panic while %s: %v", msg, err)
-				debug.PrintStack()
-			}
-		}
-	}()
-
 	// if tries is negitive, we retry forever
 	infinite := tries < 0
 
@@ -142,13 +130,31 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bo
 		} else {
 			log.Printf("%s (will retry up to %d times)", msg, tries)
 		}
-
-		success := f()
+		
+		// we have to have a new function, because one the pannic in f() makes it
+		// to our function, there is no hope of normal continued execution here
+		var success bool
+		func () {
+			// this makes sure we don't panic if f() does
+			defer func() {
+				// if we are on our last iteration, let the panic continue to bubble up
+				if tries > 1 || !allowPanic {
+					err := recover()
+					if err != nil {
+						log.Printf("Panic while %s: %v", msg, err)
+						debug.PrintStack()
+					}
+				}
+			}()
+			
+			success = f()
+		}()
+		
 		if success {
 			// f() was successful
 			return true
 		}
-
+		
 		// no point in sleeping if we are not going to retry f()
 		if tries > 1 || infinite {
 			time.Sleep(time.Duration(interval) * time.Second)
