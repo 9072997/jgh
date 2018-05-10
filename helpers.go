@@ -233,6 +233,11 @@ func HTTPRequest(client *http.Client, method string, url string, user string, pa
 		req.SetBasicAuth(user, pass)
 	}
 
+	// make new http client if none specified
+	if client == nil {
+		client = HTTPClient(false, true)
+	}
+
 	// perform the http request
 	resp, err := client.Do(req)
 	if err != nil {
