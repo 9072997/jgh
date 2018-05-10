@@ -158,7 +158,7 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bo
 	return false
 }
 
-func HttpClient(cookieJar bool, followRedirects bool) (client *http.Client) {
+func HTTPClient(cookieJar bool, followRedirects bool) (client *http.Client) {
 	log.Printf("Making new http client cookieJar:%t, followRedirects:%t", cookieJar, followRedirects)
 
 	client = new(http.Client)
@@ -181,7 +181,7 @@ func HttpClient(cookieJar bool, followRedirects bool) (client *http.Client) {
 	return
 }
 
-func HttpRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, reqBody string) (respBody string, status int) {
+func HTTPRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, reqBody string) (respBody string, status int) {
 	log.Printf("HTTP %s %s", method, url)
 
 	// empty string indicates no request body
@@ -248,7 +248,7 @@ func HttpRequest(client *http.Client, method string, url string, user string, pa
 	return
 }
 
-func RestRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, input interface{}, outputPtr interface{}) (status int, reflection bool) {
+func RESTRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, input interface{}, outputPtr interface{}) (status int, reflection bool) {
 	hasInput := input != nil
 	hasOutput := outputPtr != nil
 
@@ -275,7 +275,7 @@ func RestRequest(client *http.Client, method string, url string, user string, pa
 	}
 
 	// perform the request
-	respStr, status := HttpRequest(client, method, url, user, pass, headers, jsonStr)
+	respStr, status := HTTPRequest(client, method, url, user, pass, headers, jsonStr)
 
 	// even if the user dosen't want output, we still need a place to store
 	// it so we can check for reflection

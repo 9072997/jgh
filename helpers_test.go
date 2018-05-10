@@ -76,9 +76,9 @@ func TestTry(t *testing.T) {
 
 }
 
-func TestHttpRequest(t *testing.T) {
-	client := HttpClient(false, false)
-	resp, status := HttpRequest(client, "GET", "https://jsonplaceholder.typicode.com/posts/1", "", "", nil, "")
+func TestHTTPRequest(t *testing.T) {
+	client := HTTPClient(false, false)
+	resp, status := HTTPRequest(client, "GET", "https://jsonplaceholder.typicode.com/posts/1", "", "", nil, "")
 	if status != 200 {
 		t.Fail()
 	}
@@ -87,8 +87,8 @@ func TestHttpRequest(t *testing.T) {
 	}
 }
 
-func TestRestRequest(t *testing.T) {
-	client := HttpClient(false, false)
+func TestRESTRequest(t *testing.T) {
+	client := HTTPClient(false, false)
 	var u, uOut userStruct
 	u.ID = 7
 	u.Name = "foo"
@@ -105,7 +105,7 @@ func TestRestRequest(t *testing.T) {
 	u.Company.Name = "bazbuz"
 	u.Company.CatchPhrase = "foobazbus"
 	u.Company.Bs = "barbazbuz"
-	status, reflection := RestRequest(client, "PUT", "https://jsonplaceholder.typicode.com/users/7", "", "", nil, u, nil)
+	status, reflection := RESTRequest(client, "PUT", "https://jsonplaceholder.typicode.com/users/7", "", "", nil, u, nil)
 	if status != 200 {
 		t.Error("Status is not 200")
 	}
@@ -114,7 +114,7 @@ func TestRestRequest(t *testing.T) {
 	}
 
 	// this will return id:1 rather than id:7
-	status, reflection = RestRequest(client, "PUT", "https://jsonplaceholder.typicode.com/users/1", "", "", nil, u, nil)
+	status, reflection = RESTRequest(client, "PUT", "https://jsonplaceholder.typicode.com/users/1", "", "", nil, u, nil)
 	if status != 200 {
 		t.Error("Status is not 200")
 	}
@@ -122,7 +122,7 @@ func TestRestRequest(t *testing.T) {
 		t.Error("Reflection failed to detect diffrent ID")
 	}
 
-	status, reflection = RestRequest(client, "GET", "https://jsonplaceholder.typicode.com/users/1", "", "", nil, nil, &uOut)
+	status, reflection = RESTRequest(client, "GET", "https://jsonplaceholder.typicode.com/users/1", "", "", nil, nil, &uOut)
 	if uOut.Name != "Leanne Graham" {
 		t.Error("Didn't get name")
 	}
