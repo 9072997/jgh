@@ -210,7 +210,7 @@ func HTTPRequest(client *http.Client, method string, url string, user string, pa
 
 	// add useragent (if one wasn't specified)
 	if _, keyExists := headers["User-Agent"]; !keyExists {
-		req.Header.Add("User-Agent", "sunset-service/1.0")
+		req.Header.Add("User-Agent", "qbox-jgh/1.0")
 	}
 
 	// add request headers
