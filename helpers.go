@@ -302,7 +302,7 @@ func RESTRequest(client *http.Client, method string, url string, user string, pa
 
 func Expect(expected interface{}, input interface{}, name string) {
 	if !reflect.DeepEqual(input, expected) {
-		msg := fmt.Sprintf("Expected %v to be %v, got %s", name, expected, input)
+		msg := fmt.Sprintf("Expected %s to be %v, got %v", name, expected, input)
 		panic(msg)
 	}
 }
