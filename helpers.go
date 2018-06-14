@@ -15,6 +15,8 @@ import "math/rand"
 import "runtime/debug"
 import "unicode"
 
+var HTTPUserAgent = "qbox-jgh/1.1"
+
 // TODO better error checking on these next 3 functions, but right now, I just panic
 // on basically every error, so...
 
@@ -217,7 +219,7 @@ func HTTPRequest(client *http.Client, method string, url string, user string, pa
 
 	// add useragent (if one wasn't specified)
 	if _, keyExists := headers["User-Agent"]; !keyExists {
-		req.Header.Add("User-Agent", "qbox-jgh/1.0")
+		req.Header.Add("User-Agent", HTTPUserAgent)
 	}
 
 	// add request headers
@@ -314,7 +316,7 @@ func RESTRequest(client *http.Client, method string, url string, user string, pa
 
 func Expect(expected interface{}, input interface{}, name string) {
 	if !reflect.DeepEqual(input, expected) {
-		msg := log.Sprintf("Expected %s to be %v, got %v", name, expected, input)
+		msg := fmt.Sprintf("Expected %s to be %v, got %v", name, expected, input)
 		panic(msg)
 	}
 }
