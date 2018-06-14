@@ -328,10 +328,10 @@ func PanicOnErr(err error) {
 }
 
 // detect an error, and throws a diffrent message
-func RenameErr(err error, newErr error) {
+func RenameErr(err error, newErrMsg string) {
 	if err != nil {
 		log.Println("Renamed error: ", err)
-		panic(newErr)
+		panic(newErrMsg)
 	}
 }
 
