@@ -13,6 +13,7 @@ import "encoding/json"
 import "fmt"
 import "math/rand"
 import "runtime/debug"
+import "unicode"
 
 // TODO better error checking on these next 3 functions, but right now, I just panic
 // on basically every error, so...
@@ -337,4 +338,23 @@ func RandomString(n int) string {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(b)
+}
+
+// gets a positive number at the begining of a string
+// returns -1 on failure
+// the intended use is to pull status codes from strings like:
+// 404 unable to locate your thing
+func Status(errStr string) int {
+	var endPos int
+	var char rune
+	for endPos, char = range errStr + " " {
+		if ! unicode.IsDigit(char) {
+			break
+		}
+	}
+	status, err := strconv.Atoi(errStr[:endPos])
+	if err != nil {
+		return -1
+	}
+	return status
 }

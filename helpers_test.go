@@ -77,11 +77,11 @@ func TestTry(t *testing.T) {
 	success, msg := Try(0, 1, false, "Fake Testing Function", func() bool {
 		panic("AAAAAH!")
 	})
-	if msg.(string) != "AAAAAH!" {
-		t.Fail()
-	}
 	if success != false {
-		t.Fail()
+		t.Error("Try() returned success despite panic")
+	}
+	if msg.(string) != "AAAAAH!" {
+		t.Error("Failed to get value of panic")
 	}
 }
 
@@ -137,5 +137,32 @@ func TestRESTRequest(t *testing.T) {
 	}
 	if reflection {
 		t.Error("False positive for reflection")
+	}
+}
+
+func TestStatus(t *testing.T) {
+	status := Status("413 I'm a teapot")
+	if status != 413 {
+		t.Error("Failed to get status code")
+	}
+
+	status = Status("I'm a teapot")
+	if status != -1 {
+		t.Error("Did not correctly report lack of status code")
+	}
+
+	status = Status("I'm a teapot 413")
+	if status != -1 {
+		t.Fail()
+	}
+
+	status = Status("413")
+	if status != 413 {
+		t.Error("Could not parse bare status code")
+	}
+
+	status = Status("")
+	if status != -1 {
+		t.Error("Did not detect error on empty string")
 	}
 }
