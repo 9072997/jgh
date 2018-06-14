@@ -51,7 +51,7 @@ func testInitSlice(t *testing.T) {
 
 func TestTry(t *testing.T) {
 	tries := 0
-	success := Try(0, 7, false, "Fake Testing Function", func() bool {
+	success, _ := Try(0, 7, false, "Fake Testing Function", func() bool {
 		tries++
 		return false
 	})
@@ -63,7 +63,7 @@ func TestTry(t *testing.T) {
 	}
 
 	tries = 0
-	success = Try(0, 7, false, "Fake Testing Function", func() bool {
+	success, _ = Try(0, 7, false, "Fake Testing Function", func() bool {
 		tries++
 		return tries == 5
 	})
@@ -74,6 +74,15 @@ func TestTry(t *testing.T) {
 		t.Fail()
 	}
 
+	success, msg := Try(0, 1, false, "Fake Testing Function", func() bool {
+		panic("AAAAAH!")
+	})
+	if msg.(string) != "AAAAAH!" {
+		t.Fail()
+	}
+	if success != false {
+		t.Fail()
+	}
 }
 
 func TestHTTPRequest(t *testing.T) {

@@ -120,7 +120,8 @@ func initPtr(ptrPtrIface interface{}) {
 // retryes f()(bool) at i second intervals up to t times until f() == true
 // note that this function will also retry on panic
 // prints "msg (will retry up to t times)" for each try
-func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bool { // nolint: deadcode, megacheck
+// panicMsg contains the value from recover from the most recent panic
+func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (success bool, panicMsg interface{}) { // nolint: deadcode, megacheck
 	// if tries is negitive, we retry forever
 	infinite := tries < 0
 
@@ -133,15 +134,14 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bo
 		
 		// we have to have a new function, because one the pannic in f() makes it
 		// to our function, there is no hope of normal continued execution here
-		var success bool
 		func () {
 			// this makes sure we don't panic if f() does
 			defer func() {
 				// if we are on our last iteration, let the panic continue to bubble up
 				if tries > 1 || !allowPanic {
-					err := recover()
-					if err != nil {
-						log.Printf("Panic while %s: %v", msg, err)
+					panicMsg = recover()
+					if panicMsg != nil {
+						log.Printf("Panic while %s: %v", msg, panicMsg)
 						debug.PrintStack()
 					}
 				}
@@ -152,7 +152,7 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bo
 		
 		if success {
 			// f() was successful
-			return true
+			return
 		}
 		
 		// no point in sleeping if we are not going to retry f()
@@ -161,7 +161,7 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) bo
 		}
 	}
 	// we have run f() t times without success
-	return false
+	return
 }
 
 func HTTPClient(cookieJar bool, followRedirects bool) (client *http.Client) {
