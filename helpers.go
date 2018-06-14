@@ -314,7 +314,7 @@ func RESTRequest(client *http.Client, method string, url string, user string, pa
 
 func Expect(expected interface{}, input interface{}, name string) {
 	if !reflect.DeepEqual(input, expected) {
-		msg := fmt.Sprintf("Expected %s to be %v, got %v", name, expected, input)
+		msg := log.Sprintf("Expected %s to be %v, got %v", name, expected, input)
 		panic(msg)
 	}
 }
@@ -322,6 +322,14 @@ func Expect(expected interface{}, input interface{}, name string) {
 func PanicOnErr(err error) {
 	if err != nil {
 		panic(err)
+	}
+}
+
+// detect an error, and throws a diffrent message
+func RenameErr(err error, newErr error) {
+	if err != nil {
+		log.Println("Renamed error: ", err)
+		panic(newErr)
 	}
 }
 
