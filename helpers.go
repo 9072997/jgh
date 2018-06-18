@@ -127,12 +127,15 @@ func initPtr(ptrPtrIface interface{}) {
 func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (success bool, panicMsg interface{}) { // nolint: deadcode, megacheck
 	// if tries is negitive, we retry forever
 	infinite := tries < 0
+	loggingEnabled := len(msg) > 0
 
 	for ; tries > 0 || infinite; tries-- {
-		if tries < 0 {
-			log.Printf("%s (try %d)", msg, -tries)
-		} else {
-			log.Printf("%s (will retry up to %d times)", msg, tries)
+		if loggingEnabled {
+			if tries < 0 {
+				log.Printf("%s (try %d)", msg, -tries)
+			} else {
+				log.Printf("%s (will retry up to %d times)", msg, tries)
+			}
 		}
 		
 		// we have to have a new function, because one the pannic in f() makes it
@@ -143,7 +146,7 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (s
 				// if we are on our last iteration, let the panic continue to bubble up
 				if tries > 1 || !allowPanic {
 					panicMsg = recover()
-					if panicMsg != nil {
+					if panicMsg != nil && loggingEnabled {
 						log.Printf("Panic while %s: %v", msg, panicMsg)
 						debug.PrintStack()
 					}
