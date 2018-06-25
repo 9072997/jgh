@@ -375,3 +375,12 @@ func Status(errStr string) int {
 func Int64ToStr(i int64) (string) {
 	return strconv.FormatInt(i, 10)
 }
+
+// ReadAll reads the contents of a reader into a string
+func ReadAll(reader io.Reader) (contents string) {
+	contentsBytes, err := ioutil.ReadAll(reader)
+	if err != nil {
+			panic(err)
+	}
+	return string(contentsBytes)
+}
