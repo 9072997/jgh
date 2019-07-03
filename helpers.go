@@ -14,6 +14,8 @@ import "fmt"
 import "math/rand"
 import "runtime/debug"
 import "unicode"
+import "crypto/md5"
+import "encoding/hex"
 
 var HTTPUserAgent = "qbox-jgh/1.1"
 
@@ -383,4 +385,12 @@ func ReadAll(reader io.Reader) (contents string) {
 			panic(err)
 	}
 	return string(contentsBytes)
+}
+
+// MD5 returns the hexadecimal representation of the MD5
+// sum of the input string
+func MD5(input string) string {
+	hashBytes := md5.Sum([]byte(input))
+	hashHex := hex.EncodeToString(hashBytes[:])
+	return hashHex
 }
