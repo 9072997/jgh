@@ -1,6 +1,9 @@
 package jgh
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 type userStruct struct {
 	ID       int    `json:"id"`
@@ -164,5 +167,19 @@ func TestStatus(t *testing.T) {
 	status = Status("")
 	if status != -1 {
 		t.Error("Did not detect error on empty string")
+	}
+}
+
+func TestRandomString(t *testing.T) {
+	string1 := RandomString(5)
+	fmt.Println("Random string 1:", string1)
+	if len(string1) != 5 {
+		t.Error("Random string was not the requested length")
+	}
+
+	string2 := RandomString(5)
+	fmt.Println("Random string 2:", string2)
+	if string1 == string2 {
+		t.Error("2 random strings were the same")
 	}
 }
