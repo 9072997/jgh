@@ -1,21 +1,25 @@
 package jgh
 
-import "reflect"
-import "time"
-import "net/http"
-import "net/http/cookiejar"
-import "log"
-import "io"
-import "strconv"
-import "io/ioutil"
-import "strings"
-import "encoding/json"
-import "fmt"
-import "math/rand"
-import "runtime/debug"
-import "unicode"
-import "crypto/md5"
-import "encoding/hex"
+import (
+	"crypto/md5"
+	cryptoRand "crypto/rand"
+	"encoding/binary"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	mathRand "math/rand"
+	"net/http"
+	"net/http/cookiejar"
+	"reflect"
+	"runtime/debug"
+	"strconv"
+	"strings"
+	"time"
+	"unicode"
+)
 
 var HTTPUserAgent = "qbox-jgh/1.1"
 
@@ -139,10 +143,10 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (s
 				log.Printf("%s (will retry up to %d times)", msg, tries)
 			}
 		}
-		
-		// we have to have a new function, because one the pannic in f() makes it
+
+		// we have to have a new function, because one the panic in f() makes it
 		// to our function, there is no hope of normal continued execution here
-		func () {
+		func() {
 			// this makes sure we don't panic if f() does
 			defer func() {
 				// if we are on our last iteration, let the panic continue to bubble up
@@ -154,15 +158,15 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (s
 					}
 				}
 			}()
-			
+
 			success = f()
 		}()
-		
+
 		if success {
 			// f() was successful
 			return
 		}
-		
+
 		// no point in sleeping if we are not going to retry f()
 		if tries > 1 || infinite {
 			time.Sleep(time.Duration(interval) * time.Second)
@@ -340,17 +344,34 @@ func RenameErr(err error, newErrMsg string) {
 	}
 }
 
+type cryptoSource struct{}
+
+func (s cryptoSource) Seed(seed int64) {}
+
+func (s cryptoSource) Int63() int64 {
+	return int64(s.Uint64() & ^uint64(1<<63))
+}
+
+func (s cryptoSource) Uint64() (v uint64) {
+	err := binary.Read(cryptoRand.Reader, binary.BigEndian, &v)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return v
+}
+
+// a math/rand object that is cryptographically secure
+var Rand *mathRand.Rand
+
 func init() {
-	// we need this for the random string
-	// TODO this dosen't really give us that much entropy
-	rand.Seed(time.Now().UTC().UnixNano())
+	Rand = mathRand.New(cryptoSource{})
 }
 
 func RandomString(n int) string {
 	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, n)
 	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+		b[i] = letterBytes[Rand.Intn(len(letterBytes))]
 	}
 	return string(b)
 }
@@ -363,7 +384,7 @@ func Status(errStr string) int {
 	var endPos int
 	var char rune
 	for endPos, char = range errStr + " " {
-		if ! unicode.IsDigit(char) {
+		if !unicode.IsDigit(char) {
 			break
 		}
 	}
@@ -374,7 +395,7 @@ func Status(errStr string) int {
 	return status
 }
 
-func Int64ToStr(i int64) (string) {
+func Int64ToStr(i int64) string {
 	return strconv.FormatInt(i, 10)
 }
 
@@ -382,7 +403,7 @@ func Int64ToStr(i int64) (string) {
 func ReadAll(reader io.Reader) (contents string) {
 	contentsBytes, err := ioutil.ReadAll(reader)
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	return string(contentsBytes)
 }
