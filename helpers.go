@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"reflect"
+	"runtime"
 	"runtime/debug"
 	"strconv"
 	"strings"
@@ -332,6 +333,8 @@ func Expect(expected interface{}, input interface{}, name string) {
 
 func PanicOnErr(err error) {
 	if err != nil {
+		_, filename, line, _ := runtime.Caller(1)
+		log.Printf("Panic at %s line %d: %s\n", filename, line, err)
 		panic(err)
 	}
 }
@@ -339,6 +342,7 @@ func PanicOnErr(err error) {
 // detect an error, and throws a diffrent message
 func RenameErr(err error, newErrMsg string) {
 	if err != nil {
+		log.Printf("Panic at %s line %d: %s\n", filename, line, err)
 		log.Println("Renamed error: ", err)
 		panic(newErrMsg)
 	}
