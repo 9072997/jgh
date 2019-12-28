@@ -22,7 +22,7 @@ import (
 	"unicode"
 )
 
-var HTTPUserAgent = "qbox-jgh/1.1"
+var HTTPUserAgent = "jgh/1.1"
 
 // TODO better error checking on these next 3 functions, but right now, I just panic
 // on basically every error, so...
