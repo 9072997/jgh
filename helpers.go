@@ -400,6 +400,7 @@ func Status(errStr string) int {
 	return status
 }
 
+// Int64ToStr returns the string representation of an int64
 func Int64ToStr(i int64) string {
 	return strconv.FormatInt(i, 10)
 }

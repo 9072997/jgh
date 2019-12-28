@@ -192,3 +192,14 @@ func TestMD5(t *testing.T) {
 		t.Error("MD5 sum of test string did not match expected value")
 	}
 }
+
+func TestInt64ToStr(t *testing.T) {
+	var i int64 = -7
+	if Int64ToStr(i) != "-7" {
+		t.Error(`Int64ToStr(-7) did not return "-7"`)
+	}
+	i = 4567890123
+	if Int64ToStr(i) != "4567890123" {
+		t.Error("Int64ToStr failed when converting a number larger than 32 bits")
+	}
+}
