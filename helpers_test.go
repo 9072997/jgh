@@ -1,7 +1,9 @@
 package jgh
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -201,5 +203,106 @@ func TestInt64ToStr(t *testing.T) {
 	i = 4567890123
 	if Int64ToStr(i) != "4567890123" {
 		t.Error("Int64ToStr failed when converting a number larger than 32 bits")
+	}
+}
+
+func TestExpect(t *testing.T) {
+	var user1, user2, user3 userStruct
+	// user1
+	json.Unmarshal([]byte(`
+		{
+			"id": 1,
+			"name": "Leanne Graham",
+			"username": "Bret",
+			"email": "Sincere@april.biz",
+			"address": {
+				"street": "Kulas Light",
+				"suite": "Apt. 556",
+				"city": "Gwenborough",
+				"zipcode": "92998-3874",
+				"geo": {
+					"lat": "-37.3159",
+					"lng": "81.1496"
+				}
+			},
+			"phone": "1-770-736-8031 x56442",
+			"website": "hildegard.org",
+			"company": {
+				"name": "Romaguera-Crona",
+				"catchPhrase": "Multi-layered client-server neural-net",
+				"bs": "harness real-time e-markets"
+			}
+		}
+	`), &user1)
+	// user2, just like user 1
+	json.Unmarshal([]byte(`
+		{
+			"id": 1,
+			"name": "Leanne Graham",
+			"username": "Bret",
+			"email": "Sincere@april.biz",
+			"address": {
+				"street": "Kulas Light",
+				"suite": "Apt. 556",
+				"city": "Gwenborough",
+				"zipcode": "92998-3874",
+				"geo": {
+					"lat": "-37.3159",
+					"lng": "81.1496"
+				}
+			},
+			"phone": "1-770-736-8031 x56442",
+			"website": "hildegard.org",
+			"company": {
+				"name": "Romaguera-Crona",
+				"catchPhrase": "Multi-layered client-server neural-net",
+				"bs": "harness real-time e-markets"
+			}
+		}
+	`), &user2)
+	// user3, diffrent lat
+	json.Unmarshal([]byte(`
+		{
+			"id": 1,
+			"name": "Leanne Graham",
+			"username": "Bret",
+			"email": "Sincere@april.biz",
+			"address": {
+				"street": "Kulas Light",
+				"suite": "Apt. 556",
+				"city": "Gwenborough",
+				"zipcode": "92998-3874",
+				"geo": {
+					"lat": "99.9999",
+					"lng": "81.1496"
+				}
+			},
+			"phone": "1-770-736-8031 x56442",
+			"website": "hildegard.org",
+			"company": {
+				"name": "Romaguera-Crona",
+				"catchPhrase": "Multi-layered client-server neural-net",
+				"bs": "harness real-time e-markets"
+			}
+		}
+	`), &user3)
+
+	success, _ := Try(0, 1, false, "", func() bool {
+		Expect(user1, user2, "user2")
+		return true
+	})
+	if !success {
+		t.Error("Expect reported user1 != user2")
+	}
+
+	success, msg := Try(0, 1, false, "", func() bool {
+		Expect(user1, user3, "user3")
+		return true
+	})
+	if success {
+		t.Error("Expect reported user1 == user3")
+	}
+	if !strings.HasPrefix(msg.(string), "Expected user3 to be") {
+		t.Error("Panic message does not start with given name")
 	}
 }
