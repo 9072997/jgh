@@ -360,7 +360,7 @@ func (s cryptoSource) Int63() int64 {
 func (s cryptoSource) Uint64() (v uint64) {
 	err := binary.Read(cryptoRand.Reader, binary.BigEndian, &v)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	return v
 }
