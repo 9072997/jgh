@@ -127,10 +127,10 @@ func initPtr(ptrPtrIface interface{}) {
 
 */
 
-// retryes f()(bool) at i second intervals up to t times until f() == true
-// note that this function will also retry on panic
-// prints "msg (will retry up to t times)" for each try
-// panicMsg contains the value from recover from the most recent panic
+// Try retryes f()(bool) at i second intervals up to t times until
+// f() == true note that this function will also retry on panic prints
+// "msg (will retry up to t times)" for each try panicMsg contains the
+// value from recover from the most recent panic
 func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (success bool, panicMsg interface{}) { // nolint: deadcode, megacheck
 	// if tries is negitive, we retry forever
 	infinite := tries < 0
@@ -365,13 +365,16 @@ func (s cryptoSource) Uint64() (v uint64) {
 	return v
 }
 
-// a math/rand object that is cryptographically secure
+// Rand is a math/rand object that is cryptographically secure
 var Rand *mathRand.Rand
 
 func init() {
 	Rand = mathRand.New(cryptoSource{})
 }
 
+// RandomString returns a random string of the specified length which may
+// contain upper and lowercase letters and numbers. It uses a secure source
+// or randomness.
 func RandomString(n int) string {
 	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, n)
@@ -381,7 +384,7 @@ func RandomString(n int) string {
 	return string(b)
 }
 
-// gets a positive number at the begining of a string
+// Status gets a positive number at the begining of a string
 // returns -1 on failure
 // the intended use is to pull status codes from strings like:
 // 404 unable to locate your thing
