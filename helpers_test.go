@@ -183,3 +183,12 @@ func TestRandomString(t *testing.T) {
 		t.Error("2 random strings were the same")
 	}
 }
+
+func TestMD5(t *testing.T) {
+	if MD5("") != "d41d8cd98f00b204e9800998ecf8427e" {
+		t.Error("MD5 sum of empty string did not match expected value")
+	}
+	if MD5("Hello World") != "b10a8db164e0754105b7a99be72e3fe5" {
+		t.Error("MD5 sum of test string did not match expected value")
+	}
+}
