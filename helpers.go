@@ -254,7 +254,7 @@ func HTTPRequest(client *http.Client, method string, url string, user string, pa
 	// perform the http request
 	resp, err := client.Do(req)
 	if err != nil {
-		panic("Error while performing http request")
+		panic("Error while performing http request: " + err.Error())
 	}
 
 	// get status code
