@@ -90,6 +90,19 @@ func TestTry(t *testing.T) {
 	}
 }
 
+func TestWinHTTPRequest(t *testing.T) {
+	resp, status, headers := WinHTTPRequest("GET", "https://jsonplaceholder.typicode.com/posts/1", nil, "")
+	if status != 200 {
+		t.Fail()
+	}
+	if len(resp) < 100 {
+		t.Fail()
+	}
+	if len(headers) < 3 {
+		t.Fail()
+	}
+}
+
 func TestHTTPRequest(t *testing.T) {
 	client := HTTPClient(false, false)
 	resp, status := HTTPRequest(client, "GET", "https://jsonplaceholder.typicode.com/posts/1", "", "", nil, "")
