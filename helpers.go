@@ -24,6 +24,8 @@ import (
 
 var HTTPUserAgent = "jgh/1.1"
 
+var Logger = log.Default()
+
 // TODO better error checking on these next 3 functions, but right now, I just panic
 // on basically every error, so...
 
@@ -139,9 +141,9 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (s
 	for ; tries > 0 || infinite; tries-- {
 		if loggingEnabled {
 			if tries < 0 {
-				log.Printf("%s (try %d)", msg, -tries)
+				Logger.Printf("%s (try %d)", msg, -tries)
 			} else {
-				log.Printf("%s (will retry up to %d times)", msg, tries)
+				Logger.Printf("%s (will retry up to %d times)", msg, tries)
 			}
 		}
 
@@ -154,7 +156,7 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (s
 				if tries > 1 || !allowPanic {
 					panicMsg = recover()
 					if panicMsg != nil && loggingEnabled {
-						log.Printf("Panic while %s: %v", msg, panicMsg)
+						Logger.Printf("Panic while %s: %v", msg, panicMsg)
 						debug.PrintStack()
 					}
 				}
@@ -178,7 +180,7 @@ func Try(interval int, tries int, allowPanic bool, msg string, f func() bool) (s
 }
 
 func HTTPClient(cookieJar bool, followRedirects bool) (client *http.Client) {
-	log.Printf("Making new http client cookieJar:%t, followRedirects:%t", cookieJar, followRedirects)
+	Logger.Printf("Making new http client cookieJar:%t, followRedirects:%t", cookieJar, followRedirects)
 
 	client = new(http.Client)
 
@@ -201,12 +203,12 @@ func HTTPClient(cookieJar bool, followRedirects bool) (client *http.Client) {
 }
 
 func HTTPRequest(client *http.Client, method string, url string, user string, pass string, headers map[string]string, reqBody string) (respBody string, status int) {
-	log.Printf("HTTP %s %s", method, url)
+	Logger.Printf("HTTP %s %s", method, url)
 
 	// empty string indicates no request body
 	hasBody := len(reqBody) > 0
 	if hasBody {
-		log.Println("Request Body: ", reqBody)
+		Logger.Println("Request Body: ", reqBody)
 	}
 
 	// turn the request body into an io.Reader
@@ -267,7 +269,7 @@ func HTTPRequest(client *http.Client, method string, url string, user string, pa
 		panic("Failed to read response body from http request")
 	}
 	respBody = string(bytes)
-	log.Println("Response Body: ", respBody)
+	Logger.Println("Response Body: ", respBody)
 
 	return
 }
@@ -334,7 +336,7 @@ func Expect(expected interface{}, input interface{}, name string) {
 func PanicOnErr(err error) {
 	if err != nil {
 		_, filename, line, _ := runtime.Caller(1)
-		log.Printf("Panic at %s line %d: %s\n", filename, line, err)
+		Logger.Printf("Panic at %s line %d: %s\n", filename, line, err)
 		panic(err)
 	}
 }
@@ -343,8 +345,8 @@ func PanicOnErr(err error) {
 func RenameErr(err error, newErrMsg string) {
 	if err != nil {
 		_, filename, line, _ := runtime.Caller(1)
-		log.Printf("Panic at %s line %d: %s\n", filename, line, err)
-		log.Println("Renamed error: ", err)
+		Logger.Printf("Panic at %s line %d: %s\n", filename, line, err)
+		Logger.Println("Renamed error: ", err)
 		panic(newErrMsg)
 	}
 }
