@@ -319,3 +319,16 @@ func TestExpect(t *testing.T) {
 		t.Error("Panic message does not start with given name")
 	}
 }
+
+func TestRelPath(t *testing.T) {
+	t.Log(
+		"RelPath behavior is highly dependent on the environment, " +
+			"so you have to verify test results with your eyeballs",
+	)
+
+	t.Log(RelPath("foo", false))
+	t.Log(RelPath("../foo", false))
+	t.Log(RelPath("C:\\foo", false))
+	t.Log(RelPath("helpers.go", false))
+	t.Log(RelPath("helpers.go", true))
+}

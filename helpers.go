@@ -13,6 +13,8 @@ import (
 	mathRand "math/rand"
 	"net/http"
 	"net/http/cookiejar"
+	"os"
+	"path/filepath"
 	"reflect"
 	"runtime"
 	"runtime/debug"
@@ -425,4 +427,39 @@ func MD5(input string) string {
 	hashBytes := md5.Sum([]byte(input))
 	hashHex := hex.EncodeToString(hashBytes[:])
 	return hashHex
+}
+
+// RelPath gets the absolute path to a file. It prefers to interpret paths
+// relative to the executable, but will fall back to the current working
+// directory if the file does not exist and fallbackToWorkingDir is true.
+// Absolute paths are returned unmodified.
+func RelPath(filename string, fallbackToWorkingDir bool) string {
+	// if filename is already absolute, don't do anything
+	if filepath.IsAbs(filename) {
+		return filename
+	}
+
+	// get path to file next to this EXE
+	exePath, err := os.Executable()
+	PanicOnErr(err)
+	configDir := filepath.Dir(exePath)
+	path := filepath.Join(configDir, filename)
+
+	if fallbackToWorkingDir {
+		// if the file does not exist, but does exist in the current working
+		// directory, return the path to the one in the working directory
+		_, err = os.Stat(path)
+		if os.IsNotExist(err) {
+			// check if it exists in the working directory
+			wd, err := os.Getwd()
+			PanicOnErr(err)
+
+			_, err = os.Stat(filepath.Join(wd, filename))
+			if err == nil {
+				return filepath.Join(wd, filename)
+			}
+		}
+	}
+
+	return path
 }
